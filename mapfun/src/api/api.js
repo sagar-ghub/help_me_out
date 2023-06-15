@@ -11,6 +11,9 @@ const api = axios.create({
 
 export const register = (payload) => api.post(`/register`, payload);
 export const addTask = (payload) => api.post("/addTask", payload);
+export const getTasks = () => api.get("/gettasks");
+export const getTasksByLocation = (payload) =>
+  api.post("/gettasksbylocation", payload);
 
 // export const register = async (username, email, password) => {
 //   return await fetch(`${baseUrl}/register`, {
@@ -35,6 +38,8 @@ export const addTask = (payload) => api.post("/addTask", payload);
 const apis = {
   register,
   addTask,
+  getTasks,
+  getTasksByLocation,
 };
 
 export default apis;

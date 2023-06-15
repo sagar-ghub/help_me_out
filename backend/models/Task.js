@@ -16,6 +16,7 @@ const TaxSchema = new mongoose.Schema(
         required: true,
       },
     },
+    radius: { type: Number, required: true },
     date: { type: Date },
     time: { type: String },
   },

@@ -6,12 +6,13 @@ const router = express.Router();
 let task = {};
 
 task.addTask = (req, res) => {
-  const { title, description, location } = req.body;
+  const { title, description, location, radius } = req.body;
   const task = new Task({
     user: req.user.id,
     title,
     description,
     location,
+    radius,
   });
 
   task
@@ -24,6 +25,34 @@ task.addTask = (req, res) => {
     });
 };
 
+task.getTasks = (req, res) => {
+  Task.find()
+    .then((result) => {
+      res.status(200).json({ tasks: result });
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
+};
+task.getTasksByLocation = (req, res) => {
+  Task.find({
+    location: {
+      $near: {
+        $maxDistance: 50000,
+        $geometry: {
+          type: "Point",
+          coordinates: [req.body.lng, req.body.lat],
+        },
+      },
+    },
+  })
+    .then((result) => {
+      res.status(200).json({ tasks: result });
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
+};
 // router.get("/addtask", (req, res) => {
 //   const { user, title, description, location } = req.body;
 

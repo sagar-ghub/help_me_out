@@ -6,6 +6,8 @@ const User = require("./models/User");
 const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+require("dotenv").config();
+
 const port = process.env.PORT || 5000;
 const cors = require("cors");
 
@@ -26,6 +28,7 @@ app.use(
     credentials: true,
   })
 );
+
 mongoose
   .connect(
     `mongodb+srv://${process.env.MONGO_CRED}@cluster0.hh7px.mongodb.net/map-app?retryWrites=true&w=majority`,

@@ -4,6 +4,8 @@ const Task = require("../models/Task");
 const router = express.Router();
 const JWT_SECRET = "Ihaveasecret";
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const User = require("../models/User");
 
 let auth = {};
 
