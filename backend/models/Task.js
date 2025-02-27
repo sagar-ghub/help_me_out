@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const TaxSchema = new mongoose.Schema(
+const TaskSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
     title: { type: String, required: true },
@@ -16,13 +16,16 @@ const TaxSchema = new mongoose.Schema(
         required: true,
       },
     },
-    radius: { type: Number, required: true },
-    date: { type: Date },
-    time: { type: String },
+    status: { type: String, default: "open" },
+    // radius: { type: Number, required: true },
+    date: { type: Date, default: Date.now() },
+    acceptedBy: { type: mongoose.Types.ObjectId, ref: "User" },
+    // time: { type: String },
   },
   { collection: "tasks" }
 );
 
-const Task = mongoose.model("Task", TaxSchema);
+TaskSchema.index({ location: "2dsphere" });
+const Task = mongoose.model("Task", TaskSchema);
 
 module.exports = Task;

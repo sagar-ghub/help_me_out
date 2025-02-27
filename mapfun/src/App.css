@@ -45,3 +45,11 @@
   display: flex;
   align-items: center;
 }
+.add_marker_cursor{
+  cursor: crosshair;
+
+}
+.hand_marker_cursor{
+  cursor: default
+
+}

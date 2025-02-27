@@ -10,7 +10,7 @@ const User = require("../models/User");
 let auth = {};
 
 auth.register = async (req, res) => {
-  const { username, email, password: plainTextPassword } = req.body;
+  const { username, email, password: plainTextPassword, name } = req.body;
 
   if (!username || typeof username !== "string") {
     return res.json({ status: "error", error: "Invalid username" });
@@ -34,6 +34,7 @@ auth.register = async (req, res) => {
       username,
       email,
       password,
+      name,
     });
     console.log("User created successfully: ", response);
   } catch (error) {
@@ -50,6 +51,7 @@ auth.register = async (req, res) => {
 auth.login = async (req, res) => {
   const { username, password } = req.body;
   const user = await User.findOne({ username }).lean();
+  console.log(username, password);
 
   if (!user) {
     return res.json({ status: "error", error: "Invalid username/password" });
@@ -105,5 +107,32 @@ auth.changePassword = async (req, res) => {
     res.json({ status: "error", error: ";))" });
   }
 };
+
+auth.updateLocation = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { latitude, longitude } = req.body;
+
+    await User.updateOne(
+      { _id: userId },
+      {
+        $set: {
+          lastLocation: {
+            type: "Point",
+            coordinates: [parseFloat(longitude), parseFloat(latitude)],
+          },
+        },
+      }
+    );
+    res.json({ status: "ok" });
+  } catch (error) {
+    console.log(error);
+    res.json({ status: "error", error });
+  }
+};
+
+//POST /api/friends/request
+// POST /api/friends/requests/respond
+// GET /api/friends
 
 module.exports = auth;

@@ -6,6 +6,8 @@ import { InfoModal } from "./InfoModal";
 
 import { FaPlus, FaTimes } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
+import apis from "../api/api";
+
 mapboxgl.accessToken =
   "pk.eyJ1Ijoic2FnYXJtb2hhbnR5IiwiYSI6ImNsOHJueGlkcjBvM2Ezb24xMmY0OXZzNDMifQ.RoCjsG0LtvSHbsKXFmFGtQ";
 
@@ -15,7 +17,8 @@ export default function Map({ user }) {
   const geocoderContainerRef = useRef();
   const [lng, setLng] = useState(84.5726);
   const [lat, setLat] = useState(21.3639);
-  const [zoom, setZoom] = useState(9);
+  const [coordinates, setCoordinates] = useState([lng, lat]); // [lng, lat
+  const [zoom, setZoom] = useState(15);
   const Marker = <div></div>;
   const [show, setShow] = useState(false);
   const [addMode, setAddMode] = useState(false);
@@ -26,6 +29,58 @@ export default function Map({ user }) {
     radius: 100,
   });
   const [markers, setMarkers] = useState([]);
+
+  const addMarkers = (task, mapRef) => {
+    const el = document.createElement("div");
+    const width = 40;
+    const height = 40;
+    el.className = "marker";
+    el.style.backgroundImage = `url(https://cdn-icons-png.flaticon.com/512/106/106175.png)`;
+    el.style.width = `${width}px`;
+    el.style.height = `${height}px`;
+    el.style.backgroundSize = "100%";
+    const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+      `<div className="map-popup"><h6 >${task.title}</h6><p>${task.description}</p></div>`
+    );
+    const marker = new mapboxgl.Marker(el)
+      .setLngLat([task.location.coordinates[0], task.location.coordinates[1]])
+      .setPopup(popup)
+      .addTo(mapRef.current);
+    setMarkers([...markers, marker]);
+  };
+
+  const tasksNearby = async () => {
+    try {
+      console.log(coordinates);
+      const response = await apis.getTasksByLocation(coordinates);
+      console.log(response.data);
+      response.data.tasks.map((task) => {
+        // const el = document.createElement("div");
+        // const width = 40;
+        // const height = 40;
+        // el.className = "marker";
+        // el.style.backgroundImage = `url(https://cdn-icons-png.flaticon.com/512/106/106175.png)`;
+        // el.style.width = `${width}px`;
+        // el.style.height = `${height}px`;
+        // el.style.backgroundSize = "100%";
+        // const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+        //   `<div className="map-popup"><h6 >${task.title}</h6><p>${task.description}</p></div>`
+        // );
+        // const marker = new mapboxgl.Marker(el)
+        //   .setLngLat([
+        //     task.location.coordinates[0],
+        //     task.location.coordinates[1],
+        //   ])
+        //   .setPopup(popup)
+        //   .addTo(mapRef.current);
+        // setMarkers([...markers, marker]);
+
+        addMarkers(task, mapRef);
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const addPopup = () => {
     if (!modalData.name || !modalData.instruction) {
@@ -41,6 +96,7 @@ export default function Map({ user }) {
     setModalData({ ...modalData, id: null, name: "", instruction: "" });
   };
 
+  // console.log(mapRef.current);
   function addMarker(e) {
     if (addMode) {
       console.log(addMode + "Sdas");
@@ -70,12 +126,21 @@ export default function Map({ user }) {
   }
   useEffect(() => {
     if (mapRef.current) return; // initialize map only once
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        setCoordinates([position.coords.longitude, position.coords.latitude]);
+        setZoom(15);
+      });
+    }
     mapRef.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/streets-v11",
       center: [lng, lat],
       zoom: zoom,
     });
+    //postion the map to center using geolocation
+
     mapRef.current.addControl(
       new mapboxgl.GeolocateControl({
         positionOptions: {
@@ -95,20 +160,39 @@ export default function Map({ user }) {
         placeholder: "Search for places",
       })
     );
+
     // mapRef.current.on("click", addMarker);
   }, []);
 
   useEffect(() => {
+    //change the map center when the coordinates change
+    if (!mapRef.current) return; // wait for map to initialize
+
+    mapRef.current.flyTo({
+      center: coordinates,
+      essential: true, // this animation is considered essential with respect to prefers-reduced-motion
+    });
+
+    tasksNearby();
+  }, [coordinates]);
+
+  useEffect(() => {
+    removeMapListener();
     if (addMode) mapRef.current.once("click", addMarker);
+
     // if (!addMode) mapRef.current.off("click", addMarker);
-  }, [addMode, setAddMode]);
+  }, [addMode]);
 
   const removeMapListener = () => {
     console.log("sas");
+    if (!mapRef.current) return;
     mapRef.current.off("click", addMarker);
+    mapRef.current._listeners.click = [];
+
+    console.log(mapRef.current);
   };
   return (
-    <div>
+    <div className={addMode ? "add_marker_cursor" : "hand_marker_cursor"}>
       {/* <div className="sidebar mt-10">
         Add an Instruction by clicking the + icon
       </div> */}
@@ -123,6 +207,10 @@ export default function Map({ user }) {
         modalData={modalData}
         setModalData={setModalData}
         addPopup={addPopup}
+        //!
+        addMarkers={addMarkers}
+        mapRef={mapRef}
+        //!
         setAddMode={setAddMode}
         removeMapListener={removeMapListener}
       />

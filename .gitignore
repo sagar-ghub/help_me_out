@@ -1,3 +1,38 @@
 backend/node_modules
 backend/.env
 mapfun/node_modules
+map-next/node_modules
+
+map-next/.next/
+
+
+
+map-next/.pnp
+map-next/.pnp.js
+map-next/.yarn/install-state.gz
+
+# testing
+/coverage
+map-next/out/
+
+# production
+map-next/build
+
+# misc
+map-next/.DS_Store
+map-next/*.pem
+
+# debug
+map-next/npm-debug.log*
+map-next/yarn-debug.log*
+map-next/yarn-error.log*
+
+# local env files
+map-next/.env
+
+# vercel
+map-next/.vercel
+
+# typescript
+map-next/*.tsbuildinfo
+map-next/next-env.d.ts

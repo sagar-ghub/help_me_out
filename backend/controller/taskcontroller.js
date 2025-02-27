@@ -35,21 +35,25 @@ task.getTasks = (req, res) => {
     });
 };
 task.getTasksByLocation = (req, res) => {
+  const lat = parseFloat(req.body[0]);
+  const lng = parseFloat(req.body[1]);
   Task.find({
     location: {
       $near: {
         $maxDistance: 50000,
         $geometry: {
           type: "Point",
-          coordinates: [req.body.lng, req.body.lat],
+          coordinates: [lat, lng],
         },
       },
     },
+    // status: "open",
   })
     .then((result) => {
       res.status(200).json({ tasks: result });
     })
     .catch((err) => {
+      console.log(err);
       res.status(500).json({ error: err });
     });
 };

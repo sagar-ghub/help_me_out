@@ -12,6 +12,8 @@ export function InfoModal({
   addPopup,
   setAddMode,
   removeMapListener,
+  addMarkers,
+  mapRef,
 }) {
   const handleClose = () => {
     addPopup();
@@ -27,17 +29,22 @@ export function InfoModal({
 
     // let payload = { ...modalData };
     let payload = {
-      name: modalData.name,
+      // name: modalData.name,
       title: modalData.title || "",
-      description: modalData.instruction,
+      description: modalData.description,
       location: [modalData.lngLat.lng, modalData.lngLat.lat],
 
       // user: modalData.user,
     };
 
+    payload["location"] = {
+      type: "Point",
+      coordinates: [modalData.lngLat.lng, modalData.lngLat.lat],
+    };
     console.log("payload::", payload);
     apis.addTask(payload).then((res) => {
       console.log("res::", res);
+      addMarkers(payload, mapRef);
     });
   };
   const handleShow = () => setShow(true);
@@ -55,14 +62,14 @@ export function InfoModal({
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-              <Form.Label>Your name</Form.Label>
+              <Form.Label>Title</Form.Label>
               <Form.Control
                 type="email"
                 placeholder="name@example.com"
                 autoFocus
-                value={modalData.name}
+                value={modalData.title}
                 onChange={(e) =>
-                  setModalData({ ...modalData, name: e.target.value })
+                  setModalData({ ...modalData, title: e.target.value })
                 }
               />
             </Form.Group>
@@ -70,13 +77,13 @@ export function InfoModal({
               className="mb-3"
               controlId="exampleForm.ControlTextarea1"
             >
-              <Form.Label>Instruction</Form.Label>
+              <Form.Label>Description</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
-                value={modalData.instruction}
+                value={modalData.description}
                 onChange={(e) =>
-                  setModalData({ ...modalData, instruction: e.target.value })
+                  setModalData({ ...modalData, description: e.target.value })
                 }
               />
             </Form.Group>

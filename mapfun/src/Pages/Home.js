@@ -11,19 +11,19 @@ export default function Home() {
   console.log(user);
   let socket;
   const serverUrl = "http://localhost:5000";
-  useEffect(() => {
-    socket = io(serverUrl);
-    socket.on("message", (data) => {
-      console.log("data::", data);
-    });
-    socket.emit("valor", { id: 1, name: "asdasd" }, (error) => {
-      console.log("error::", error);
-    });
+  // useEffect(() => {
+  //   socket = io(serverUrl);
+  //   socket.on("message", (data) => {
+  //     console.log("data::", data);
+  //   });
+  //   socket.emit("valor", { id: 1, name: "asdasd" }, (error) => {
+  //     console.log("error::", error);
+  //   });
 
-    socket.on("receiveGreet", (data) => {
-      console.log("data::", data);
-    });
-  }, []);
+  //   socket.on("receiveGreet", (data) => {
+  //     console.log("data::", data);
+  //   });
+  // }, []);
 
   return (
     <div>
