@@ -1,5 +1,5 @@
 let middleware = {};
-const JWT_SECRET = "Ihaveasecret";
+const JWT_SECRET = process.env.JWT_SECRET || "Ihaveasecret";
 const jwt = require("jsonwebtoken");
 middleware.checkUserAuth = (req, res, next) => {
   try {
