@@ -11,19 +11,56 @@ task.addTask = (req, res) => {
     user: req.user.id,
     title,
     description,
-    location,
+
     radius,
   });
-
+  task.location = {
+    type: "Point",
+    coordinates: [parseFloat(location[0]), parseFloat(location[1])],
+  };
   task
     .save()
     .then((result) => {
-      res.status(201).json({ message: "Task Added" });
+      res
+        .status(201)
+        .json({ status: 201, message: "Task Added", task: result });
+      setImmediate(() => {
+        sendNotifications(result, req);
+      });
     })
     .catch((err) => {
       res.status(500).json({ error: err });
     });
 };
+async function sendNotifications(task, req) {
+  try {
+    // Get the Socket.io instance from the Express app
+    const io = req.app.get("socketio");
+
+    // Find users near the task's location within the given radius (in meters)
+    const usersToNotify = await User.find({
+      lastLocation: {
+        $near: {
+          $geometry: task.location,
+          $maxDistance: task.radius,
+        },
+      },
+    });
+
+    // Notify each user; for this example, assume each user has joined a room with their user ID
+    usersToNotify.forEach((user) => {
+      io.to(user._id.toString()).emit("newTaskNotification", {
+        taskId: task._id,
+        title: task.title,
+        description: task.description,
+        location: task.location,
+        radius: task.radius,
+      });
+    });
+  } catch (error) {
+    console.error("Error sending notifications:", error);
+  }
+}
 
 task.getTasks = (req, res) => {
   Task.find()

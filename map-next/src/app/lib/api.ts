@@ -1,7 +1,7 @@
 import { getSession } from "next-auth/react";
 
 // lib/api.ts
-const API_ENDPOINT:string=process.env.API_ENDPOINT || "http://localhost:5000/api";
+const API_ENDPOINT:string=process.env.NEXT_PUBLIC_API_ENDPOINT || "http://localhost:5000/api";
 export async function apiRequest<T>(
     endpoint: string,
     method: "GET" | "POST" | "PUT" | "DELETE" = "GET",

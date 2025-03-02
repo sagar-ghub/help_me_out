@@ -142,7 +142,11 @@ app.use("/api", routes);
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  /* options */
+  cors: {
+    origin: "http://localhost:3000", // allow requests from your Next.js app
+    methods: ["GET", "POST"],
+    credentials: true, // if you need to send cookies or authentication headers
+  },
 });
 
 app.set("socketio", io);
@@ -169,9 +173,10 @@ app.get("/", async (req, res) => {
 //   });
 // });
 io.on("connect", (socket) => {
-  console.log("user connected");
+  console.log("User connected:", socket.id);
 
   socket.emit("message", "CHeck your notification");
+  socket.emit("newTaskNotification", "CHeck your notification");
 
   socket.on("valor", ({ id, name }, callback) => {
     console.log("data::", id, name);

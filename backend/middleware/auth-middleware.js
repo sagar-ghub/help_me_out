@@ -15,7 +15,7 @@ middleware.checkUserAuth = (req, res, next) => {
         if (!err && tokenData) {
           req.user = {};
           req.user = tokenData;
-          console.log("tokenData", tokenData);
+          // console.log("tokenData", tokenData);
 
           next();
         } else {

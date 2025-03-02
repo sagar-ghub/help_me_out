@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import { apiRequest } from "@/app/lib/api";
+import NotificationListener from "@/app/components/NotificationListener";
 
 // Define a simple user type
 interface User {
@@ -16,14 +17,14 @@ interface User {
 export default function FriendsPage() {
   // Dummy data for demonstration purposes
   const [friendRequests, setFriendRequests] = useState<User[]>([
-    { _id:"",id: "4", name: "David", email: "david@example.com", status: "Online" },
-    { _id:"",id: "5", name: "Eve", email: "eve@example.com", status: "Offline" },
+    // { _id:"",id: "4", name: "David", email: "david@example.com", status: "Online" },
+    // { _id:"",id: "5", name: "Eve", email: "eve@example.com", status: "Offline" },
   ]);
 
   const [friends, setFriends] = useState<User[]>([
-    { _id:"",id: "1", name: "Alice", email: "alice@example.com", status: "Online" },
-    { _id:"",id: "2", name: "Bob", email: "bob@example.com", status: "Offline" },
-    { _id:"",id: "3", name: "Charlie", email: "charlie@example.com", status: "Online" },
+    // { _id:"",id: "1", name: "Alice", email: "alice@example.com", status: "Online" },
+    // { _id:"",id: "2", name: "Bob", email: "bob@example.com", status: "Offline" },
+    // { _id:"",id: "3", name: "Charlie", email: "charlie@example.com", status: "Online" },
   ]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<User[]>([]);
@@ -194,11 +195,11 @@ export default function FriendsPage() {
                 <ul className="space-y-4">
                   {friends.map((friend) => (
                     <li
-                      key={friend.id}
+                      key={friend._id}
                       className="p-4 bg-white dark:bg-gray-800 rounded-md shadow flex items-center hover:scale-105 transform transition"
                     >
                       <img
-                        src={`/avatar${friend.id}.png`}
+                        src={`https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${friend._id}`}
                         alt={`${friend.name} Avatar`}
                         className="w-12 h-12 rounded-full mr-4 shadow-sm"
                       />

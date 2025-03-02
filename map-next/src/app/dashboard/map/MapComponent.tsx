@@ -50,7 +50,7 @@ export default function MapComponentWithLocation() {
         latitude: coords[1],
         longitude: coords[0],
       });
-      console.log("API call successful:", data);
+      console.log("Last location updated:", data);
     } catch (error) {
       console.error("API call error:", error);
     }
@@ -59,6 +59,14 @@ export default function MapComponentWithLocation() {
     const data:any=await apiRequest("/friendList");
     setFriends(data.friends);
 
+  }
+  const getAvatarIcon=(name:string)=>{
+    return L.icon({
+      iconUrl: `https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${name}`,
+      iconSize: [40, 40],
+      iconAnchor: [12, 12],
+      popupAnchor: [0, 0],
+  });
   }
   
   // Attempt to fetch the user's current location
@@ -98,7 +106,12 @@ export default function MapComponentWithLocation() {
         </Marker> */}
         {friends.map((friend,index)=>{
          const coords: [number, number] = friend.lastLocation.coordinates;
-          return <Marker position={coords} >
+          return <Marker position={coords} key={`marker${index}`} icon={L.icon({
+            iconUrl: `https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${friend._id}`,
+            iconSize: [40, 40],
+            iconAnchor: [12, 12],
+            popupAnchor: [0, 0],
+        })}>
              <Popup>
             {friend.name}
           </Popup>

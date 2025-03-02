@@ -1,5 +1,6 @@
 "use client";
 
+import NotificationListener from "@/app/components/NotificationListener";
 import { getSession, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -31,6 +32,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen flex">
       {/* Sidebar */}
+      <NotificationListener />
       <aside className="w-64 bg-gray-900 text-gray-200 flex flex-col p-6">
         <div className="mb-8 flex items-center justify-center">
           <h2 className="text-2xl font-bold">My Dashboard</h2>

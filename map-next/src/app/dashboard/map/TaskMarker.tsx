@@ -4,10 +4,13 @@
 import { useState } from "react";
 import { Marker, Popup, useMapEvents } from "react-leaflet";
 import L from "leaflet";
+import { apiRequest } from "@/app/lib/api";
+import { title } from "process";
 
 export default function TaskMarker() {
   const [position, setPosition] = useState<L.LatLng | null>(null);
   const [taskDescription, setTaskDescription] = useState("");
+  const [taskTitle, setTaskTitle] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   // Listen for map click events
@@ -19,13 +22,17 @@ export default function TaskMarker() {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit =async (e: React.FormEvent) => {
     e.preventDefault();
     // For now, just log the data. Later, call your API endpoint.
     console.log("Task added at", position, "with description:", taskDescription);
+    let res:any=await apiRequest("/addtask","POST",{
+      title:taskTitle, description:taskDescription, location:[position?.lat,position?.lng], radius:50
+    })
+    if(res.status==201)
     setSubmitted(true);
   };
-
+  
   if (!position) return null;
 
   return (
@@ -34,6 +41,16 @@ export default function TaskMarker() {
         {!submitted ? (
           <form onSubmit={handleSubmit} className="space-y-2">
             <div>
+            <label className="block text-sm font-medium text-gray-700">
+                Task Title
+              </label>
+              <input
+                type="text"
+                value={taskTitle}
+                onChange={(e) => setTaskTitle(e.target.value)}
+                placeholder="Enter task title..."
+                className="mt-1 block w-full border border-gray-300 rounded-md p-1"
+              />
               <label className="block text-sm font-medium text-gray-700">
                 Task Description
               </label>
