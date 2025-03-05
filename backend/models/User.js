@@ -22,6 +22,7 @@ const UserSchema = new mongoose.Schema(
   },
   { collection: "users", timestamps: true }
 );
+UserSchema.index({ lastLocation: "2dsphere" });
 
 const model = mongoose.model("User", UserSchema);
 

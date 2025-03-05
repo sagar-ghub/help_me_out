@@ -174,7 +174,7 @@ export default function DashboardPage() {
         <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4">
             Welcome, 
-            {/* {session?.user?.name} */}
+            {session?.user?.name}
           </h1>
           <p className="text-gray-600 dark:text-gray-300">
             This is your dashboard where you can manage tasks, view maps, chat with friends,

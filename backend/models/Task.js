@@ -6,26 +6,17 @@ const TaskSchema = new mongoose.Schema(
     title: { type: String, required: true },
     description: { type: String, required: true },
     location: {
-      type: {
-        type: String, // Don't do `{ location: { type: String } }`
-        enum: ["Point"], // 'location.type' must be 'Point'
-        required: true,
-      },
-      coordinates: {
-        type: [Number],
-        required: true,
-      },
+      type: { type: String, enum: ["Point"], required: true },
+      coordinates: { type: [Number], required: true },
     },
     status: { type: String, default: "open" },
-    // radius: { type: Number, required: true },
-    date: { type: Date, default: Date.now() },
-    acceptedBy: { type: mongoose.Types.ObjectId, ref: "User" },
-    // time: { type: String },
+    radius: { type: Number },
+    acceptedBy: { type: mongoose.Types.ObjectId, ref: "User", default: null },
+    date: { type: Date, default: Date.now },
   },
-  { collection: "tasks" }
+  { collection: "tasks", timestamps: true }
 );
 
 TaskSchema.index({ location: "2dsphere" });
 const Task = mongoose.model("Task", TaskSchema);
-
 module.exports = Task;

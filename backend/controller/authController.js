@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Task = require("../models/Task");
 const router = express.Router();
-const JWT_SECRET = "Ihaveasecret";
+// const JWT_SECRET = "Ihaveasecret";
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
@@ -64,11 +64,17 @@ auth.login = async (req, res) => {
       {
         id: user._id,
         username: user.username,
+        name: user.name,
       },
       JWT_SECRET
     );
 
-    return res.json({ status: "ok", data: token });
+    return res.json({
+      status: "ok",
+      data: token,
+      username: user.name,
+      userId: user._id,
+    });
   }
 
   res.json({ status: "error", error: "Invalid username/password" });
@@ -89,7 +95,7 @@ auth.changePassword = async (req, res) => {
   }
 
   try {
-    const user = jwt.verify(token, JWT_SECRET);
+    const user = jwt.verify(token, process.env.JWT_SECRET);
 
     const _id = user.id;
 

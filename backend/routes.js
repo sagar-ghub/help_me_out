@@ -5,8 +5,9 @@ const taskController = require("./controller/taskcontroller");
 const authController = require("./controller/authController");
 const friendController = require("./controller/friendController");
 const middleware = require("./middleware/auth-middleware");
+router.post("/accepttask", middleware.checkUserAuth, taskController.acceptTask);
 router.post("/addtask", middleware.checkUserAuth, taskController.addTask);
-router.get("/gettasks", middleware.checkUserAuth, taskController.getTasks);
+router.get("/tasks", middleware.checkUserAuth, taskController.getTasks);
 router.post(
   "/gettasksbylocation",
   middleware.checkUserAuth,

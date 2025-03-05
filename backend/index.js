@@ -172,28 +172,50 @@ app.get("/", async (req, res) => {
 //     console.log("A user disconnected");
 //   });
 // });
+
 io.on("connect", (socket) => {
-  console.log("User connected:", socket.id);
+  const token = socket.handshake.auth?.token;
+  if (!token) {
+    console.log("No token provided. Disconnecting...");
+    return socket.disconnect();
+  }
+  // console.log("User connected:", socket.id);
 
-  socket.emit("message", "CHeck your notification");
-  socket.emit("newTaskNotification", "CHeck your notification");
+  // socket.emit("message", "CHeck your notification");
+  // // socket.emit("newTaskNotification", "CHeck your notification");
 
-  socket.on("valor", ({ id, name }, callback) => {
-    console.log("data::", id, name);
+  // socket.on("valor", ({ id, name }, callback) => {
+  //   console.log("data::", id, name);
 
-    socket.emit(
-      "receiveGreet",
-      { data: "This message from server" },
-      (error) => {
-        console.log("error::", error);
-      }
-    );
-    callback();
-  });
+  //   socket.emit(
+  //     "receiveGreet",
+  //     { data: "This message from server" },
+  //     (error) => {
+  //       console.log("error::", error);
+  //     }
+  //   );
 
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
-  });
+  try {
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id; // Extract user ID from token
+
+    // Join a room with user ID (so we can send notifications later)
+    socket.join(userId);
+    console.log(`User ${userId} joined their room`);
+
+    // Send a welcome message (optional)
+    socket.emit("welcome", { message: "Connected to notifications!" });
+
+    // Handle disconnect
+    socket.on("disconnect", () => {
+      console.log(`User ${userId} disconnected`);
+    });
+  } catch (err) {
+    console.error("Invalid token:", err);
+    socket.disconnect();
+  }
+  // callback();
 });
 
 httpServer.listen(port, () => {

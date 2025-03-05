@@ -1,5 +1,6 @@
 // components/SocketProvider.tsx
 "use client";
+import { useSession } from "next-auth/react";
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { io, Socket } from "socket.io-client";
 
@@ -17,10 +18,16 @@ interface SocketProviderProps {
 
 export const SocketProvider = ({ children }: SocketProviderProps) => {
   const [socket, setSocket] = useState<Socket | null>(null);
+  const { data: session } = useSession();
 
   useEffect(() => {
     // Connect to your Socket.io server (adjust the URL accordingly)
-    const socketIo = io(process.env.NEXT_PUBLIC_API_ENDPOINT || "http://localhost:5000");
+    if(!session)
+    return
+    const socketIo = io(process.env.NEXT_PUBLIC_API_ENDPOINT || "http://localhost:5000",{
+      auth: { token: session?.user.token }, // Send token for authentication
+      transports: ["websocket"], // Ensure WebSocket is used
+    });
 
     setSocket(socketIo);
 
@@ -28,7 +35,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     return () => {
       socketIo.disconnect();
     };
-  }, []);
+  }, [session]);
 
   return (
     <SocketContext.Provider value={{ socket }}>

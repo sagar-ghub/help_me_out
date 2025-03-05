@@ -37,7 +37,7 @@ const handler= NextAuth({
           // localStorage.setItem("token",response.data)
           return {
             id: response.userId || "",
-            // name: response.username || credentials.username,
+            name: response.username || credentials.username,
             // email: response.email || "no-email@example.com",
             token: response.data, // your backend token
           };
