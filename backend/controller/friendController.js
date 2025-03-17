@@ -194,4 +194,32 @@ friend.suggestions = async (req, res) => {
     res.status(500).json({ status: "error", error: "Server error" });
   }
 };
+friend.searchUsers = async (req, res) => {
+  try {
+    const { query } = req.query; // Get search query from request
+
+    if (!query) {
+      return res.status(400).json({ error: "Search query is required." });
+    }
+
+    // Dynamic search filter for name, username, and email
+    const searchFilter = {
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { username: { $regex: query, $options: "i" } },
+        { email: { $regex: query, $options: "i" } },
+      ],
+    };
+
+    const users = await User.find(searchFilter)
+      .select("name username email") // Only return essential fields
+      .limit(10); // Limit results to 10 users for better performance
+
+    res.status(200).json({ users });
+  } catch (error) {
+    console.error("Error searching users:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 module.exports = friend;

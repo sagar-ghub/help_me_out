@@ -66,7 +66,7 @@ auth.login = async (req, res) => {
         username: user.username,
         name: user.name,
       },
-      JWT_SECRET
+      process.env.JWT_SECRET
     );
 
     return res.json({

@@ -64,6 +64,7 @@ async function sendNotifications(task, req) {
         location: task.location,
         radius: task.radius,
         user: req.user.name,
+        userId: req.user.id,
       });
     });
   } catch (error) {
