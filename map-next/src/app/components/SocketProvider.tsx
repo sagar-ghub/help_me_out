@@ -24,7 +24,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     // Connect to your Socket.io server (adjust the URL accordingly)
     if(!session)
     return
-    const socketIo = io(process.env.NEXT_PUBLIC_API_ENDPOINT || "http://localhost:5000",{
+    const socketIo = io(process.env.NEXT_PUBLIC_WEBSOCKET_ENDPOINT || "http://localhost:5000",{
       auth: { token: session?.user.token }, // Send token for authentication
       transports: ["websocket"], // Ensure WebSocket is used
     });

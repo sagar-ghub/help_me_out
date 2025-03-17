@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import { apiRequest } from "@/app/lib/api";
-import NotificationListener from "@/app/components/NotificationListener";
+// import NotificationListener from "@/app/components/NotificationListener";
 
 // Define a simple user type
 interface User {

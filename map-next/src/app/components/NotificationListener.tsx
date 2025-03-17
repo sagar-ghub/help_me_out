@@ -1,13 +1,14 @@
-// components/NotificationListener.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import { useSocket } from "./SocketProvider";
-import { v4 as uuidv4 } from "uuid";
-import Image from "next/image";
+// import { v4 as uuidv4 } from "uuid";
+// import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { apiRequest } from "../lib/api";
+import { useRouter } from "next/navigation";
+
 
 interface Notification {
   taskId: string;
@@ -18,9 +19,20 @@ interface Notification {
   location: { lat: number; lng: number };
 }
 
+interface Chat {
+  _id: string;
+  participants: { _id: string; username: string }[];
+  messages: Message[];
+}
+interface Message {
+  sender: string;
+  text: string;
+  timestamp: string;
+}
 export default function NotificationListener() {
   const { socket } = useSocket();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
+  const router=useRouter()
   const [notification, setNotification] = useState<Notification | null>(null);
 
   useEffect(() => {
@@ -30,17 +42,17 @@ export default function NotificationListener() {
         console.log("📩 Received task notification:", data);
 
         
-        setNotification(prev => ({
-            taskId:data.taskId,
+        setNotification({
+          taskId:data.taskId,
           message: `Hey ${session?.user?.name || "User"}, ${data?.user || "Someone"} has a task near your location.`,
           title: data.title || "New Task",
           description: data.description || "A task is available nearby!",
-          friend: data.friend || "Unknown",
+          friend: data.userId || "Unknown",
           location: { 
             lat: data.location?.coordinates?.[1] || 20.5, // Ensure latitude is second
             lng: data.location?.coordinates?.[0] || 80.4  // Longitude is first
           },
-        }));
+        });
       };
 
     socket.on("newTaskNotification", handleNewTaskNotification);
@@ -50,13 +62,32 @@ export default function NotificationListener() {
     };
   }, [socket]);
 
-  const handleAccept = async () => {
-    const data=await apiRequest("/accepttask","POST",{
-        taskId:notification?.taskId
-    })
-    
-    setNotification(null);
+  const handleAccept = async (taskId: string, creatorId: string) => {
+    try {
+      // API call to accept the task
+      await apiRequest("/tasks/accept", "POST", { taskId });
+  
+      // Fetch existing chats
+      const chatData = await apiRequest<{ chats: Chat[] }>("/chats", "GET");
+      const existingChat = chatData.chats.find((chat) =>
+        chat.participants.some((p) => p._id === creatorId)
+      );
+  
+      if (existingChat) {
+        // ✅ If chat exists, navigate to chat page
+        router.push(`/dashboard/chat?chatId=${existingChat._id}`);
+      } else {
+        // ✅ If chat does not exist, create a new one
+        const newChat = await apiRequest<{ chat: Chat }>("/chat/start", "POST", {
+          userId: creatorId,
+        });
+        router.push(`/dashboard/chat?chatId=${newChat.chat._id}`);
+      }
+    } catch (error) {
+      console.error("Error accepting task:", error);
+    }
   };
+  
 
   const handleReject = () => {
     setNotification(null);
@@ -106,10 +137,10 @@ export default function NotificationListener() {
 
             {/* Action Buttons */}
             <div className="flex justify-center space-x-4 mt-4">
-              <button
-                onClick={handleAccept}
-                className="px-4 py-2 bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition"
-              >
+            <button
+      onClick={() => handleAccept(notification.taskId, notification.friend)}
+      className="mt-2 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
+    >
                 ✅ Accept
               </button>
               <button

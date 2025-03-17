@@ -1,7 +1,7 @@
 "use client";
 
 import NotificationListener from "@/app/components/NotificationListener";
-import { getSession, useSession } from "next-auth/react";
+import {  useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -10,8 +10,8 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-//   const { data: session, status } = useSession();
-    let status=""
+  const {  status } = useSession();
+  // const status=""
   const router = useRouter();
 
   // Redirect if unauthenticated
@@ -183,17 +183,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   );
 }
 
-export async function getServerSideProps(context: any) {
-  const session = await getSession(context);
-  if (!session) {
-    return {
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    };
-  }
-  return {
-    props: { session },
-  };
-}
+// export async function getServerSideProps(context: any) {
+//   const session = await getSession(context);
+//   if (!session) {
+//     return {
+//       redirect: {
+//         destination: "/login",
+//         permanent: false,
+//       },
+//     };
+//   }
+//   return {
+//     props: { session },
+//   };
+// }

@@ -41,7 +41,7 @@ export default function SignupPage() {
         setError( "Signup failed");
       }
     } catch (err) {
-      setError("An unexpected error occurred");
+      setError("An unexpected error occurred. Error:"+err);
     }
   };
 

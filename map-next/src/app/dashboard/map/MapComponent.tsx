@@ -10,6 +10,7 @@ import { User } from "next-auth";
 
 // Fix missing marker icons for Leaflet
 // delete L.Icon.Default.prototype._getIconUrl;
+
 L.Icon.Default.mergeOptions({
   iconUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png",
   iconRetinaUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon-2x.png",
@@ -32,6 +33,17 @@ export default function MapComponentWithLocation() {
   const [coords, setCoords] = useState<[number, number]>(defaultCoords);
   const [locationError, setLocationError] = useState("");
   const [friends, setFriends] = useState<User[]>([]);
+  // useEffect(()=>{
+  //   const initializeLeaflet = async () => {
+      // const L = await import("leaflet"); // ✅ ES6 dynamic import
+      // L.Icon.Default.mergeOptions({
+      //   iconUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png",
+      //   iconRetinaUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon-2x.png",
+      //   shadowUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png",
+      // });
+  //   };
+  //   initializeLeaflet();
+  // },[])
 
   let lastSentTime = 0;
 
@@ -60,19 +72,41 @@ export default function MapComponentWithLocation() {
     setFriends(data.friends);
 
   }
-  const getAvatarIcon=(name:string)=>{
-    return L.icon({
-      iconUrl: `https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${name}`,
-      iconSize: [40, 40],
-      iconAnchor: [12, 12],
-      popupAnchor: [0, 0],
-  });
-  }
+  // const getAvatarIcon=(name:string)=>{
+  //   return L.icon({
+  //     iconUrl: `https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${name}`,
+  //     iconSize: [40, 40],
+  //     iconAnchor: [12, 12],
+  //     popupAnchor: [0, 0],
+  // });
+  // }
   
   // Attempt to fetch the user's current location
+  // useEffect(() => {
+  //   fetchFriendList()
+  //   if (navigator.geolocation) {
+  //     navigator.geolocation.getCurrentPosition(
+  //       (position) => {
+  //         const newCoords: [number, number] = [
+  //           position.coords.latitude,
+  //           position.coords.longitude,
+  //         ];
+  //         setCoords(newCoords);
+  //         sendCoords(newCoords);
+  //       },
+  //       (error) => {
+  //         console.error("Error obtaining location:", error);
+  //         setLocationError("Unable to retrieve your location.");
+  //       }
+  //     );
+  //   } else {
+  //     setLocationError("Geolocation is not supported by your browser.");
+  //   }
+  // }, []);
   useEffect(() => {
+    // Ensure this runs only on the client
     fetchFriendList()
-    if (navigator.geolocation) {
+    if (typeof window !== "undefined" && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const newCoords: [number, number] = [
@@ -91,6 +125,7 @@ export default function MapComponentWithLocation() {
       setLocationError("Geolocation is not supported by your browser.");
     }
   }, []);
+  
 
   return (
     <div className="relative h-full w-full">
@@ -104,14 +139,18 @@ export default function MapComponentWithLocation() {
             {locationError ? locationError : "You are here!"}
           </Popup>
         </Marker> */}
-        {friends.map((friend,index)=>{
+        {friends.map((friend:any,index)=>{
+          // const L = await import("leaflet"); 
          const coords: [number, number] = friend.lastLocation.coordinates;
-          return <Marker position={coords} key={`marker${index}`} icon={L.icon({
+          return <Marker position={coords} key={`marker${index}`} 
+          icon={
+            L.icon({
             iconUrl: `https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${friend._id}`,
             iconSize: [40, 40],
             iconAnchor: [12, 12],
             popupAnchor: [0, 0],
-        })}>
+        })}
+        >
              <Popup>
             {friend.name}
           </Popup>
@@ -147,6 +186,7 @@ export default function MapComponentWithLocation() {
           Update Location
         </button>
       </div>
+      {locationError?locationError:""}
     </div>
   );
 }

@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import { apiRequest } from "@/app/lib/api";
+import { useRouter } from "next/navigation";
 
 interface Task {
   _id: string;
   title: string;
   description: string;
+  user:string
 }
 
 export default function TasksPage() {
@@ -16,6 +18,7 @@ export default function TasksPage() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const router=useRouter()
 
   useEffect(() => {
     async function fetchTasks() {
@@ -40,6 +43,9 @@ export default function TasksPage() {
   const closeModal = () => {
     setSelectedTask(null);
   };
+  const handleChatNow=(user:string)=>{
+    router.push(`/dashboard/chat?chatId=${user}`);
+  }
 
   const renderTaskList = (tasks: Task[], title: string) => (
     <div className="flex-1 p-4 bg-gray-50 dark:bg-gray-700 rounded-md shadow overflow-y-auto">
@@ -105,10 +111,10 @@ export default function TasksPage() {
                 {selectedTask.description}
               </p>
               <button
-                onClick={closeModal}
+                onClick={()=>handleChatNow(selectedTask.user)}
                 className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
               >
-                Close
+                Chat Now!
               </button>
             </div>
           </div>

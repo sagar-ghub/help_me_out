@@ -1,13 +1,12 @@
 // components/Header.tsx
 "use client"
-import Link from 'next/link'
-import { useTheme } from 'next-themes'
-import { signIn, signOut, useSession } from 'next-auth/react'
+// import { useTheme } from 'next-themes'
+// import {  useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 
 export default function Header() {
-  const { theme, setTheme } = useTheme()
-  const { data: session } = useSession()
+  // const { theme, setTheme } = useTheme()
+  // const { data: session } = useSession()
   const [mounted, setMounted] = useState(false)
 
   // Ensures theme is only rendered on the client
